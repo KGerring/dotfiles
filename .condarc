@@ -1,0 +1,8 @@
+channels:
+  - defaults
+  - https://repo.anaconda.com/pkgs/main
+  - https://repo.anaconda.com/pkgs/r
+  - conda-forge
+default_python:
+solver: classic
+ssl_verify: true

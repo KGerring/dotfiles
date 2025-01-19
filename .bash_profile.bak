@@ -1,0 +1,435 @@
+#!/usr/bin/env bash
+
+if [ -f ~/.bashrc ]; then
+	source ~/.bashrc
+fi
+
+#if [ -f ~/.bashprofile ]; then
+#	source ~/.bashprofile
+#fi
+
+export HOME="/Users/kristen"
+export SHELLCHECK_OPTS='--shell=bash'
+
+#Add the following line to your ~/.bash_profile:
+#[[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && . "/usr/local/etc/profile.d/bash_completion.sh"
+#
+#[[ -r "/usr/local/etc/bash_completion.d/launchctl" ]] && . "/usr/local/etc/bash_completion.d/launchctl"
+###  /usr/local/etc/bash_completion.d
+#
+#_completion_loader()
+#{    . "/etc/bash_completion.d/$1.sh" >/dev/null 2>&1 && return 124}
+#complete -D -F _completion_loader -o bashdefault -o default
+#
+#
+#   ---------------------------
+#       SHOPT
+#  cdspell: fix spelling errors in `cd`
+#   ---------------------------
+
+shopt -s nocaseglob
+shopt -s cdspell
+
+export LC_COLLATE=C
+#export HISTTIMEFORMAT='%F %T '
+#export HISTCONTROL='ignoreboth' #HISTCONTROL=erasedups
+#export HISTFILESIZE=2000000
+#export HISTSIZE=10000
+#export HISTIGNORE="?:??:ls:ll:ls -alh:pwd:clear:history"
+
+#shopt -s histappend        # append to history, dont overwrite it
+
+#shopt -s cmdhist           # attempt to save all lines of a multiple-line command in the same history entry
+
+#shopt -s lithist           # save multi-line commands to the history with embedded newlines
+# After each command, append to the history file and reread it
+#export PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$"\n"}history -a; history -c; history -r"
+
+if [ ! -x "$(which tree 2>/dev/null)" ]; then
+	alias cheap-tree="find . -print | sed -e 's;[^/]*/;|____;g;s;____|; |;g'"
+fi
+
+export CACHER_APIKEY="xyf6VvAxP9cKEnqd3SC1Wpf7"
+export CACHER_APITOKEN="XEX123LPLsjXZEDgVz4Ec5ij"
+export CACHERIO_KEY="xyf6VvAxP9cKEnqd3SC1Wpf7"
+export CACHERIO_TOKEN="XEX123LPLsjXZEDgVz4Ec5ij"
+
+export ALGOLIA_APP_ID="1b74040aedcd4cd4a8c4f9d06c32d598"
+export ALGOLIA_API_KEY="1b74040aedcd4cd4a8c4f9d06c32d598"
+#   ---------------------------
+#       ENVVARS
+#  Export common config-names
+#   ---------------------------
+
+alias echo="/bin/echo"
+
+reset="\033[0m"
+black="\033[0;30m"
+blue="\033[0;34m"
+cyan="\033[0;36m"
+green="\033[0;32m"
+orange="\033[0;33m"
+purple="\033[0;35m"
+red="\033[0;31m"
+violet="\033[0;35m"
+white="\033[0;37m"
+yellow="\033[0;33m"
+
+RESET="\033[0m"
+BLACK="\033[1;30m"
+BLUE="\033[1;34m"
+CYAN="\033[1;36m"
+GREEN="\033[1;32m"
+ORANGE="\033[1;33m"
+PURPLE="\033[1;35m"
+RED="\033[1;31m"
+VIOLET="\033[1;35m"
+WHITE="\033[1;37m"
+YELLOW="\033[1;33m"
+
+export JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk-15.0.1.jdk/Contents/Home/bin"
+
+export RSYNC_LOGFILE="${HOME}/.rsync.log"
+export GITIGNORE_GLOBAL="${HOME}/.gitignore_global"
+export ANSIBLE_CONFIG="${HOME}/.ansible/ansible.cfg"
+export LOGURU_FORMAT="<green>{time:MM-DD HH:mm}</green> |<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>"
+export LOGURU_AUTOINIT='True'
+
+export MACHINE_GITHUB_API_TOKEN="f3e021ff0242261ce0b95a62fd7b1baae237f27e"
+export PY_DEVTOOLS_HIGHLIGHT="True"
+export YOUTRACK_URL_DUP="https://kgerring.myjetbrains.com/"
+export YOUTRACK_TOKEN="perm:cm9vdA==.NDktMA==.852LDmS2z6RfSSrG3ZU7pqB1UJ3gkJ"
+export INFLUXDB_TOKEN="6c7af917804846cb947371b12e1a52ea"
+export GITHUB_TOKEN_NEW="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"
+#export PYTEST_DISABLE_PLUGIN_AUTOLOAD="1"
+
+#   ---------------------------
+#       RECENTS
+#  New things
+#   ---------------------------
+
+function listssh() {
+	echo -e "ssh-keygen -lv -f ~/.ssh/known_hosts"
+	ssh-keygen -lv -f ~/.ssh/known_hosts
+}
+
+function syncdesktop() {
+
+	printf "${yellow} #TODO: get hostnames from list? ${reset}\n"
+
+	local FOLDER
+	FOLDER=${2:-repos}
+
+	if [[ -n $1 ]]; then
+		printf "rsync ${cyan} ${PWD}/$1 ${reset} to ${violet} /repos/$1 ${reset}\n"
+		rsync $1 -azv --log-file="${RSYNC_LOGFILE}" --exclude='.git*' \
+			--exclude-from="${GITIGNORE_GLOBAL}" kristen@kristen.local:~/${FOLDER}/
+		unset FOLDER
+	fi
+}
+
+function syncrepo() {
+	### check if $1 exists
+	### run --dry-run
+	printf "${yellow} #TODO: get hostnames from list? ${reset}\n"
+
+	local REMOTE
+	REMOTE=${2:-pycharmpi}
+
+	if [[ -n $1 ]]; then
+		printf "rsync ${cyan} ${PWD}/$1 ${reset} to ${violet} /home/pi/repos/$1 ${reset}\n"
+		echo "logfile --log-file=${RSYNC_LOGFILE} --exclude='.git*' --exclude-from=${GITIGNORE_GLOBAL}"
+		echo "syncing with pi@${REMOTE}.local"
+
+		rsync $1 -azv --log-file="${RSYNC_LOGFILE}" --exclude='.git*' \
+			--exclude-from="${GITIGNORE_GLOBAL}" pi@${REMOTE}.local:~/repos/
+		unset REMOTE
+	fi
+}
+
+function syncfile() {
+	printf "${yellow} #TODO: get hostnames from list? ${reset}\n"
+
+	local REMOTE
+	REMOTE=${2:-pycharmpi}
+
+	if [ -f $1 ]; then
+		printf "rsync ${cyan} $1 ${reset} to ${violet} /home/pi/Documents/$1 ${reset}\n"
+		rsync $1 -azv --log-file="${HOME}/.rsync.log" pi@${REMOTE}.local:/home/pi/Documents/
+		unset REMOTE
+	fi
+}
+
+function ldir() {
+
+	if [[ -n $1 ]]; then
+		ls -F -G -l $1 | grep '/$'
+
+	elif [[ -z $1 ]]; then
+		ls -F -G -l ${1:PWD} | grep /$
+	fi
+}
+
+#   ---------------------------
+#       ENVVARS
+#  Export common config-names
+#   ---------------------------
+
+export BASH_SILENCE_DEPRECATION_WARNING=1
+#export XML_CATALOG_FILES="/etc/xml/catalog/catalog.xml"
+#export SGML_CATALOG_FILES=""
+#export RNG_SCHEMA_FOLDER="/Users/kristen/.xmlcatalog/rngschema"
+
+export YOUTRACK_URL="https://kgerring.myjetbrains.com/youtrack"
+export YOUTRACK_LOGIN="kgerring@gmail.com"
+export YOUTRACK_PASSWORD="Ekalb43931"
+export WEBHOOK_VERIFY_TOKEN="ac5613a95c50733c63c72a910edffd7dc1e22376c6dd7d1b"
+
+export DROPBOX_KEY="c0bbjbn70p05obd"
+export DROPBOX_SECRET="uhg1nuxlb92vahf"
+export DROPBOX_TOKEN="Th5hvwVfeSAAAAAAAAAAotrzpY8Qfn2Gy5D10MuG6tG42WrKl-YDsj6Djz140LQ0"
+#export DROPBOX_TOKEN = 'Th5hvwVfeSAAAAAAAAAAotrzpY8Qfn2Gy5D10MuG6tG42WrKl-YDsj6Djz140LQ0'
+
+export SHELL="/opt/homebrew/bin/bash"
+export XDG_CACHE_HOME="${HOME}/.cache"
+export XDG_CONFIG_HOME="${HOME}/.config"
+export XDG_DATA_HOME="${XDG_STATE_HOME}"
+export XDG_STATE_HOME="${HOME}/.state"
+export PYLINT_CONFIG="${XDG_CONFIG_HOME}/pylint"
+export PICKLESHARE="${XDG_CACHE_HOME}/.pickleshare/cache"
+export PROJECTDIR="${HOME}/PycharmProjects"
+export GIT="${PROJECTDIR}/Git"
+export PROJECT="${GIT}/modularities"
+export PROJ="${PROJECTDIR}"
+export PYCHARM_VERSION="PyCharm2019.3"
+export PYCHARM_SCRATCH="${HOME}/Library/Preferences/${PYCHARM_VERSION}/scratches"
+export PYCHARM_VM_OPTIONS="${HOME}/Library/Preferences/${PYCHARM_VERSION}/pycharm.vmoptions"
+export PYLINTHOME="${HOME}/.pylint"
+
+export CPPFLAGS="-I/usr/local/opt/sqlite/include"
+export DOWNLOADS="${HOME}/Downloads"
+export EDITOR="/usr/bin/nano"
+export FIREFOX_BINARY="/Applications/FirefoxDeveloperEdition.app/Contents/MacOS/firefox-bin"
+export FIREFOX_PROFILE="${HOME}/Library/Application Support/Firefox/Profiles/lsvbvalb.dev-edition-default"
+export GIT_EDITOR="nano"
+export GIT_PYTHON_TRACE="full"
+
+export GITHUB_HOMEBREW_API_TOKEN="7ba7ca5bfae35bd8a9e8453df1d794d169eb17f8"
+export HOMEBREW_EVAL_ALL="True"
+export HOMEBREW_AUTOREMOVE="True"
+#export HOMEBREW_DEBUG="True"
+export HOMEBREW_VERBOSE"True"
+export HOMEBREW_NO_AUTO_UPDATE="True"
+
+export GITHUB_TOKEN="b6250f824ec3e4fa583b196d574a6a471d41b018"
+#export GITHUBTOKEN="8c922b93ca8678aed4ed473d67b30af9d3a5cbbf"
+export HB="7ba7ca5bfae35bd8a9e8453df1d794d169eb17f8"
+export HOMEBREW_DEV_CMD_RUN="True"
+export HOMEBREW_INSTALL_CLEANUP="True"
+export HOMEBREW_NO_AUTO_UPDATE="1"
+export JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk1.8.0_121.jdk/Contents/Home"
+
+#export IPYTHON_STARTUP="${HOME}/.ipython/profile_default/startup"
+export MANPATH="/usr/local/opt/coreutils/libexec/gnuman:/usr/local/opt/findutils/libexec/gnuman:$MANPATH"
+export NGROK_AUTHTOKEN="4F5bPLdMZuXdedeQRAQp8_2DcBNefvQhb2oFbzTBfXj"
+export PYTHON37="/opt/anaconda3/bin/python3.7"
+export SP37="/opt/anaconda3/bin/python3.7"
+export PYTHON38="/Library/Frameworks/Python.framework/Versions/3.8/bin/python3.8"
+export PYTHON39="/opt/python3.9.0/bin/python3.9"
+export PYTHONBREAKPOINT="ipdb.set_trace"
+#export PYTHONDEBUG="true"
+export PYTHONDONTWRITEBYTECODE="true"
+export PYTHONHUNTERCONFIG="stdlib=False,force_colors=True"
+#export PYTHONOPTIMIZE="true"
+export PYTHONPYCACHEPREFIX="${HOME}/CACHE"
+#export PYTHONSTARTUP="${HOME}/.ipython/profile_mycluster/startup/_ipython_start.py"
+export PYTHONWARNINGS="once::SyntaxWarning"
+export PYTHONWARNINGS="ignore::DeprecationWarning,ignore::UnicodeWarning"
+export RSA_DEFAULT='new_rsa'
+export SPOTIPY_CLIENT_ID="0f281e3b206749399b906650fa770d3a"
+export SPOTIPY_CLIENT_SECRET="b2217405808b4291b793d22b365ee0d7"
+export SSH_DIRECTORY="${HOME}/.ssh"
+export TZ="/usr/share/zoneinfo/US/Eastern"
+export WEBSEQ_API_KEY="799vySVUtZ6PvG4__eIMKCe-VVjAZ3hJ"
+export WHOOSH_INDEX="${HOME}/.whoosh"
+
+export PA="/opt/homebrew/opt"
+
+export PATH="/opt/python3.9.0/bin:/usr/local/Cellar/openjdk/15.0.1/bin"
+export PATH="$PATH:/usr/local/opt/coreutils/libexec/gnubin:/usr/local/bin"
+export PATH="$PATH:/opt/anaconda3/bin"
+
+export PATH="$PATH:/bin:/usr/bin:/usr/sbin"
+export PATH="$PATH:/Library/Frameworks/Python.framework/Versions/3.8/bin"
+export PATH="$PATH:/usr/local/sbin/:/sbin:/usr/sbin"
+export PATH="$PATH:/usr/local/bin"
+export PATH="$PATH:/Library/Developer/CommandLineTools/usr/bin"
+export PATH="$PATH:${HOME}/go/bin"
+export PATH="$PATH:/usr/local/opt/tree/bin"
+export PATH="$PATH:${HOME}/.prometheus"
+export PATH="/Users/kristen/.buck/bin:/opt/python3.9.0/bin:$PATH"
+export PATH="$PATH:${HOME}/.gh/bin"
+export PATH="$PATH:${HOME}/.buck/bin"
+export PATH="$PATH:/usr/local/Cellar/postgresql@12/12.5/bin"
+export PATH="/opt/homebrew"
+export PATH="$PATH:/Applications/PyCharm.app/Contents/MacOS"
+
+#   ---------------------------
+#     ALIASES
+#   ---------------------------
+
+alias youtubedl="youtube-dl --no-check-certificate "
+alias subl='/Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl '
+alias charm='/Applications/PyCharm.app/Contents/MacOS/charm '
+alias finderShowHidden='defaults write com.apple.finder ShowAllFiles TRUE'
+alias finderHideHidden='defaults write com.apple.finder ShowAllFiles FALSE'
+alias hideFiles='defaults write com.apple.finder AppleShowAllFiles NO; killall Finder /System/Library/CoreServices/Finder.app'
+alias showFiles='defaults write com.apple.finder AppleShowAllFiles YES; killall Finder /System/Library/CoreServices/Finder.app'
+
+alias listDomains='defaults domains | sed s/","/""/g| xargs -n 1'
+alias less='less -FSRXc'
+alias gfind='find'
+alias myip='curl ip.appspot.com'                  # myip:         Public facing IP Address
+alias netCons='lsof -i'                           # netCons:      Show all open TCP/IP sockets
+alias flushDNS='dscacheutil -flushcache'          # flushDNS:     Flush out the DNS Cache
+alias lsock='sudo /usr/sbin/lsof -i -P'           # lsock:        Display open sockets
+alias lsockU='sudo /usr/sbin/lsof -nP | grep UDP' # lsockU:       Display only open UDP sockets
+alias lsockT='sudo /usr/sbin/lsof -nP | grep TCP' # lsockT:       Display only open TCP sockets
+alias ipInfo0='ipconfig getpacket en0'            # ipInfo0:      Get info on connections for en0
+alias my-ip='ipconfig getifaddr en0'
+alias ipInfo1='ipconfig getpacket en1'       # ipInfo1:      Get info on connections for en1
+alias openPorts='sudo lsof -i | grep LISTEN' # openPorts:    All listening connections
+alias showBlocked='sudo ipfw list'           # showBlocked:  All ipfw rules inc/ blocked IPs
+
+alias namefind="find . -name " # namefind:    Quickly search for file
+alias top='top -o cpu'
+alias memorySummary='top -l 1 | head -8'
+alias map="xargs -n1"
+alias sublime='subl'
+alias tstat='stat  -t "%Y-%M-%dT%H:%M:%S"'
+alias grep="grep --colour=always"
+alias list_files='echo *'
+alias ll="ls -aFGltr --color=always"
+alias ls="ls -Ga  --color=always"
+alias lsd='ls -lF --color | grep --color=never '\''^d'\'''
+
+alias namefind="find . -name "
+alias pplist='plutil -p'
+alias dscleanup="find . -type f -name '*.DS_Store' -ls -delete"
+alias isort_force="isort --force-single-line-imports --keep-direct-and-as --no-sections --atomic"
+
+### open in Sublime Text
+function sub() {
+	if [ -f $1 ]; then
+		printf "${orange} opening ${reset} ${blue} '$@' ${reset}\n"
+		open "$@" -a "Sublime Text"
+	fi
+}
+
+function tre() {
+	tree -aC -I '.git|__pycache__|*.pyc' --dirsfirst "$@" | less -FRNX
+}
+
+#/Users/kristen/bash_scripts/new/bas.sh
+
+# Determine size of a file or total size of a directory
+function fs() {
+	if du -b /dev/null >/dev/null 2>&1; then
+		local arg=-sbh
+	else
+		local arg=-sh
+	fi
+
+	if [[ -n $@ ]]; then
+		du $arg -- "$@"
+	else
+		du $arg .[^.]* ./*
+	fi
+}
+
+# if [[ -n "$@" ]]; then
+
+function extract() {
+	if [ -f $1 ]; then
+		case $1 in
+		*.tar.bz2) tar xjf $1 ;;
+		*.tar.gz) tar xzf $1 ;;
+		*.bz2) bunzip2 $1 ;;
+		*.rar) unrar e $1 ;;
+		*.gz) gunzip $1 ;;
+		*.tar) tar xf $1 ;;
+		*.tbz2) tar xjf $1 ;;
+		*.tgz) tar xzf $1 ;;
+		*.zip) unzip $1 ;;
+		*.Z) uncompress $1 ;;
+		*.7z) 7z x $1 ;;
+		*) echo "'$1' cannot be extracted via extract()" ;;
+		esac
+	else
+		echo "'$1' is not a valid file"
+	fi
+}
+
+#   showa: to remind yourself of an
+#   ------------------------------------------------------------
+
+function showa() { /usr/bin/grep --color=always -i -a1 $@ ~/Library/init/bash/aliases.bash | grep -v '^\s*$' | less -FSRXc; }
+
+function uniq_path() {
+	if [ -n "$PATH" ]; then
+		old_PATH=$PATH:
+		PATH=
+		while [ -n "$old_PATH" ]; do
+			x=${old_PATH%%:*} # the first remaining entry
+			case $PATH: in
+			*:"$x":*) ;;        # already there
+			*) PATH=$PATH:$x ;; # not there yet
+			esac
+			old_PATH=${old_PATH#*:}
+		done
+		PATH=${PATH#:}
+		unset old_PATH x
+	fi
+}
+
+alias wget='wget --no-check-certificate'
+export STUBS="/Users/kristen/.mypy/stubs"
+export SKIP_CYTHON="1"
+export PYTHONUSERBASE="/Users/kristen/local"
+#export PYTHONPATH = "/Users/kristen/local"
+
+#: @todo mv to script d=.dircolors
+#: @todo mv to script test -r $d && eval "$(dircolors $d)"
+#: @todo mv to script alias config='/usr/bin/git --git-dir=/Users/kristen/.cfg/ --work-tree=/Users/kristen'
+#: @todo mv to script
+#: @todo mv to script # HSTR configuration - add this to ~/.bashrc
+#: @todo mv to script alias hh=hstr                    # hh to be alias for hstr
+#: @todo mv to script export HSTR_CONFIG=hicolor       # get more colors
+#: @todo mv to script export MANPATH="/usr/local/opt/coreutils/libexec/gnuman:/usr/local/opt/findutils/libexec/gnuman:$MANPATH"
+#: @todo mv to script export GIT_EDITOR="nano"
+#: @todo mv to script
+#: @todo mv to script export HISTTIMEFORMAT='%F %T '
+#: @todo mv to script export HISTCONTROL='ignoreboth' #HISTCONTROL=erasedups
+#: @todo mv to script export HISTFILESIZE=2000000
+#: @todo mv to script export HISTSIZE=10000
+#: @todo mv to script export HISTIGNORE="?:??:ls:ll:ls -alh:pwd:clear:history"
+#: @todo mv to script # append to history, dont overwrite it
+#: @todo mv to script shopt -s histappend
+#: @todo mv to script # attempt to save all lines of a multiple-line command in the same history entry
+#: @todo mv to script shopt -s cmdhist
+#: @todo mv to script # save multi-line commands to the history with embedded newlines
+#: @todo mv to script shopt -s lithist
+#: @todo mv to script # After each command, append to the history file and reread it
+#: @todo mv to script export PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$"\n"}history -a; history -c; history -r"
+
+# ${reset} to ${violet}
+#if [[ "$(POST_FILE_RAN)" ]]; then
+#    printf "got... ${POST_FILE_RAN};  ${GREEN} SUCCESS!!! ${reset}\n"
+#elif [[ ! "$(POST_FILE_RAN)" ]]; then
+#    printf " ${RED} FAIL!!! POST_FILE_RAN not set ${reset}\n"
+#fi
+
+# opam configuration
+
+export CHARM="/usr/local/bin/charm"
+export CONDA="/opt/anaconda3/bin"

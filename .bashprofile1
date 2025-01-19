@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+alias brew="/opt/homebrew/bin/brew "
+
+export CACHERKEY="Qd8qqT3eEfSvGEdqHJyGUiaL"
+export CACHERTOKEN="dTKexQGG8GbsK94N9Ftv5PPL"
+export PYTEST_DISABLE_PLUGIN_AUTOLOAD="1"
+export KERKO_ZOTERO_API_KEY="FTzOL3IUQk6r34uLL0YMNtOr"
+export KERKO_ZOTERO_LIBRARY_ID="10865098"
+export KERKO_ZOTERO_LIBRARY_TYPE="user"
+export KERKO_DATA_DIR="/Users/kristen/.kerko"
+export BOT_USERNAME='KDGerring'
+export BOT_PASSWORD="ekalb4393@im2s34irnaeg5iscks2u94pbam8gm4pn"
+
+alias show="defaults write com.apple.finder AppleShowAllFiles -bool true && killall Finder"
+alias hh='hstr --non-interactive '
+
+__conda_setup="$('/Users/kristen/anaconda3/bin/conda' 'shell.bash' 'hook' 2>/dev/null)"
+if [ $? -eq 0 ]; then
+	eval "$__conda_setup"
+else
+	if [ -f "/Users/kristen/anaconda3/etc/profile.d/conda.sh" ]; then
+		. "/Users/kristen/anaconda3/etc/profile.d/conda.sh"
+	else
+		export PATH="/Users/kristen/anaconda3/bin:$PATH"
+	fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+
+export PATH="/Users/kristen/anaconda3/bin:/opt/homebrew/bin:/Users/kristen/anaconda3/condabin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
+export PATH="/opt/homebrew/bin:$PATH"
+export PATH="/Applications/Sublime Text.app/Contents/SharedSupport/bin:$PATH"
+export PATH="/opt/homebrew/Caskroom/miniconda/base/bin:$PATH"
